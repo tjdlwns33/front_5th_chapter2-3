@@ -25,55 +25,11 @@ import {
   TableRow,
   Textarea,
 } from "../shared/ui"
-
-export interface Reactions {
-  likes: number
-  dislikes: number
-}
-
-export interface User {
-  id: number
-  username: string
-  image: string
-  firstName?: string
-  lastName?: string
-  age?: number
-  email?: string
-  phone?: string
-  address?: {
-    address: string
-    city: string
-    state: string
-  }
-  company?: {
-    name: string
-    title: string
-  }
-}
-
-export interface Post {
-  id: number
-  title: string
-  body: string
-  userId: number
-  tags?: string[]
-  author?: User
-  reactions?: Reactions
-}
-
-export interface Comment {
-  id: number
-  postId: number
-  userId: number
-  body: string
-  likes: number
-  user?: User
-}
-
-interface Tag {
-  url: string
-  slug: string
-}
+import { FetchPostsResponse, Post } from "../entities/post/model/types"
+import { Tag } from "../shared/model/types"
+import { FetchUsersResponse, User } from "../entities/user/model/types"
+import { Comment } from "../entities/comment/model/types"
+import { UserModal } from "../entities/user/ui/UserModal"
 
 const PostsManager = () => {
   const navigate = useNavigate()
@@ -116,15 +72,6 @@ const PostsManager = () => {
   const [showEditCommentDialog, setShowEditCommentDialog] = useState<boolean>(false)
   const [showPostDetailDialog, setShowPostDetailDialog] = useState<boolean>(false)
   const [showUserModal, setShowUserModal] = useState<boolean>(false)
-
-  interface FetchPostsResponse {
-    posts: Post[]
-    total: number
-  }
-
-  interface FetchUsersResponse {
-    users: User[]
-  }
 
   // URL 업데이트 함수
   const updateURL = () => {
@@ -780,38 +727,7 @@ const PostsManager = () => {
       </Dialog>
 
       {/* 사용자 모달 */}
-      <Dialog open={showUserModal} onOpenChange={setShowUserModal}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>사용자 정보</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <img src={selectedUser?.image} alt={selectedUser?.username} className="w-24 h-24 rounded-full mx-auto" />
-            <h3 className="text-xl font-semibold text-center">{selectedUser?.username}</h3>
-            <div className="space-y-2">
-              <p>
-                <strong>이름:</strong> {selectedUser?.firstName} {selectedUser?.lastName}
-              </p>
-              <p>
-                <strong>나이:</strong> {selectedUser?.age}
-              </p>
-              <p>
-                <strong>이메일:</strong> {selectedUser?.email}
-              </p>
-              <p>
-                <strong>전화번호:</strong> {selectedUser?.phone}
-              </p>
-              <p>
-                <strong>주소:</strong> {selectedUser?.address?.address}, {selectedUser?.address?.city},{" "}
-                {selectedUser?.address?.state}
-              </p>
-              <p>
-                <strong>직장:</strong> {selectedUser?.company?.name} - {selectedUser?.company?.title}
-              </p>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <UserModal open={showUserModal} onOpenChange={setShowUserModal} user={selectedUser} />
     </Card>
   )
 }
