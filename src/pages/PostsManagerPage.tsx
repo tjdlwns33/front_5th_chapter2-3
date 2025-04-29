@@ -26,10 +26,29 @@ import {
   Textarea,
 } from "../shared/ui"
 
+export interface Reactions {
+  likes: number
+  dislikes: number
+}
+
 export interface User {
   id: number
   username: string
   image: string
+  firstName?: string
+  lastName?: string
+  age?: number
+  email?: string
+  phone?: string
+  address?: {
+    address: string
+    city: string
+    state: string
+  }
+  company?: {
+    name: string
+    title: string
+  }
 }
 
 export interface Post {
@@ -39,6 +58,7 @@ export interface Post {
   userId: number
   tags?: string[]
   author?: User
+  reactions?: Reactions
 }
 
 export interface Comment {
@@ -47,6 +67,12 @@ export interface Comment {
   userId: number
   body: string
   likes: number
+  user?: User
+}
+
+interface Tag {
+  url: string
+  slug: string
 }
 
 const PostsManager = () => {
@@ -71,7 +97,7 @@ const PostsManager = () => {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">((queryParams.get("sortOrder") as "asc" | "desc") || "asc")
   const [loading, setLoading] = useState<boolean>(false)
 
-  const [tags, setTags] = useState<string[]>([])
+  const [tags, setTags] = useState<Tag[]>([])
   const [selectedTag, setSelectedTag] = useState<string>(queryParams.get("tag") || "")
 
   const [comments, setComments] = useState<Record<number, Comment[]>>({})
@@ -383,7 +409,12 @@ const PostsManager = () => {
     setLimit(parseInt(params.get("limit") || "10"))
     setSearchQuery(params.get("search") || "")
     setSortBy(params.get("sortBy") || "")
-    setSortOrder(params.get("sortOrder") || "asc")
+    const sortOrderParam = params.get("sortOrder")
+    if (sortOrderParam === "asc" || sortOrderParam === "desc") {
+      setSortOrder(sortOrderParam)
+    } else {
+      setSortOrder("asc")
+    }
     setSelectedTag(params.get("tag") || "")
   }, [location.search])
 
@@ -443,7 +474,10 @@ const PostsManager = () => {
               </div>
             </TableCell>
             <TableCell>
-              <div className="flex items-center space-x-2 cursor-pointer" onClick={() => openUserModal(post.author)}>
+              <div
+                className="flex items-center space-x-2 cursor-pointer"
+                onClick={() => post.author && openUserModal(post.author)}
+              >
                 <img src={post.author?.image} alt={post.author?.username} className="w-8 h-8 rounded-full" />
                 <span>{post.author?.username}</span>
               </div>
@@ -483,7 +517,7 @@ const PostsManager = () => {
   )
 
   // 댓글 렌더링
-  const renderComments = (postId) => (
+  const renderComments = (postId: number) => (
     <div className="mt-2">
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-sm font-semibold">댓글</h3>
@@ -502,7 +536,7 @@ const PostsManager = () => {
         {comments[postId]?.map((comment) => (
           <div key={comment.id} className="flex items-center justify-between text-sm border-b pb-1">
             <div className="flex items-center space-x-2 overflow-hidden">
-              <span className="font-medium truncate">{comment.user.username}:</span>
+              <span className="font-medium truncate">{comment.user?.username}:</span>
               <span className="truncate">{highlightText(comment.body, searchQuery)}</span>
             </div>
             <div className="flex items-center space-x-1">
@@ -588,7 +622,14 @@ const PostsManager = () => {
                 <SelectItem value="reactions">반응</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={sortOrder} onValueChange={setSortOrder}>
+            <Select
+              value={sortOrder}
+              onValueChange={(value) => {
+                if (value === "asc" || value === "desc") {
+                  setSortOrder(value)
+                }
+              }}
+            >
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="정렬 순서" />
               </SelectTrigger>
@@ -669,13 +710,19 @@ const PostsManager = () => {
             <Input
               placeholder="제목"
               value={selectedPost?.title || ""}
-              onChange={(e) => setSelectedPost({ ...selectedPost, title: e.target.value })}
+              onChange={(e) => {
+                if (!selectedPost) return
+                setSelectedPost({ ...selectedPost, title: e.target.value })
+              }}
             />
             <Textarea
               rows={15}
               placeholder="내용"
               value={selectedPost?.body || ""}
-              onChange={(e) => setSelectedPost({ ...selectedPost, body: e.target.value })}
+              onChange={(e) => {
+                if (!selectedPost) return
+                setSelectedPost({ ...selectedPost, body: e.target.value })
+              }}
             />
             <Button onClick={updatePost}>게시물 업데이트</Button>
           </div>
@@ -709,7 +756,10 @@ const PostsManager = () => {
             <Textarea
               placeholder="댓글 내용"
               value={selectedComment?.body || ""}
-              onChange={(e) => setSelectedComment({ ...selectedComment, body: e.target.value })}
+              onChange={(e) => {
+                if (!selectedComment) return
+                setSelectedComment({ ...selectedComment, body: e.target.value })
+              }}
             />
             <Button onClick={updateComment}>댓글 업데이트</Button>
           </div>
@@ -720,11 +770,11 @@ const PostsManager = () => {
       <Dialog open={showPostDetailDialog} onOpenChange={setShowPostDetailDialog}>
         <DialogContent className="max-w-3xl">
           <DialogHeader>
-            <DialogTitle>{highlightText(selectedPost?.title, searchQuery)}</DialogTitle>
+            <DialogTitle>{highlightText(selectedPost?.title ?? "", searchQuery)}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <p>{highlightText(selectedPost?.body, searchQuery)}</p>
-            {renderComments(selectedPost?.id)}
+            <p>{highlightText(selectedPost?.body ?? "", searchQuery)}</p>
+            {selectedPost?.id !== undefined && renderComments(selectedPost?.id)}
           </div>
         </DialogContent>
       </Dialog>
