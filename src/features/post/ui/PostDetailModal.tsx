@@ -1,9 +1,10 @@
 import { Dialog, DialogContent, DialogTitle } from "@radix-ui/react-dialog"
-import { Post } from "../model/types"
-import { DialogHeader } from "../../../shared/ui"
+import { Post } from "../../../entities/post/model/types"
+
 import { highlightText } from "../../../shared/lib/highlightText"
-import { CommentsSection } from "../../../features/comments/CommentsSection"
+import { CommentsSection } from "../../comments/ui/CommentsSection"
 import { Comment } from "../../../entities/comment/model/types"
+import { DialogHeader } from "../../../shared/ui/Modal"
 
 interface PostDetailModalProps {
   open: boolean

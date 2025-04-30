@@ -1,37 +1,23 @@
 import { useEffect, useState } from "react"
-import { Edit2, MessageSquare, Plus, Search, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react"
+import { Plus, Search } from "lucide-react"
 import { useLocation, useNavigate } from "react-router-dom"
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-  Textarea,
-} from "../shared/ui"
+
 import { FetchPostsResponse, Post } from "../entities/post/model/types"
 import { Tag } from "../shared/model/types"
 import { FetchUsersResponse, User } from "../entities/user/model/types"
 import { Comment } from "../entities/comment/model/types"
 import { UserModal } from "../entities/user/ui/UserModal"
-import { highlightText } from "../shared/lib/highlightText"
-import { PostDetailModal } from "../entities/post/ui/PostDetailModal"
+import { PostDetailModal } from "../features/post/ui/PostDetailModal"
+import { EditCommentModal } from "../features/comments/ui/EditCommentModal"
+import { AddCommentModal } from "../features/comments/ui/AddCommentModal"
+import { PostEditModal } from "../features/post/ui/PostEditModal"
+import { PostAddModal } from "../features/post/ui/PostAddModal"
+import { Pagination } from "../shared/ui/Pagination"
+import { Button } from "../shared/ui/Button"
+import { Card, CardContent, CardHeader, CardTitle } from "../shared/ui/Card"
+import { Input } from "../shared/ui/Input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@radix-ui/react-select"
+import { PostTable } from "../features/post/ui/PostTable"
 
 const PostsManager = () => {
   const navigate = useNavigate()
@@ -367,137 +353,6 @@ const PostsManager = () => {
     setSelectedTag(params.get("tag") || "")
   }, [location.search])
 
-  // 게시물 테이블 렌더링
-  const renderPostTable = () => (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-[50px]">ID</TableHead>
-          <TableHead>제목</TableHead>
-          <TableHead className="w-[150px]">작성자</TableHead>
-          <TableHead className="w-[150px]">반응</TableHead>
-          <TableHead className="w-[150px]">작업</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {posts.map((post) => (
-          <TableRow key={post.id}>
-            <TableCell>{post.id}</TableCell>
-            <TableCell>
-              <div className="space-y-1">
-                <div>{highlightText(post.title, searchQuery)}</div>
-
-                <div className="flex flex-wrap gap-1">
-                  {post.tags?.map((tag) => (
-                    <span
-                      key={tag}
-                      className={`px-1 text-[9px] font-semibold rounded-[4px] cursor-pointer ${
-                        selectedTag === tag
-                          ? "text-white bg-blue-500 hover:bg-blue-600"
-                          : "text-blue-800 bg-blue-100 hover:bg-blue-200"
-                      }`}
-                      onClick={() => {
-                        setSelectedTag(tag)
-                        updateURL()
-                      }}
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </TableCell>
-            <TableCell>
-              <div
-                className="flex items-center space-x-2 cursor-pointer"
-                onClick={() => post.author && openUserModal(post.author)}
-              >
-                <img src={post.author?.image} alt={post.author?.username} className="w-8 h-8 rounded-full" />
-                <span>{post.author?.username}</span>
-              </div>
-            </TableCell>
-            <TableCell>
-              <div className="flex items-center gap-2">
-                <ThumbsUp className="w-4 h-4" />
-                <span>{post.reactions?.likes || 0}</span>
-                <ThumbsDown className="w-4 h-4" />
-                <span>{post.reactions?.dislikes || 0}</span>
-              </div>
-            </TableCell>
-            <TableCell>
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" onClick={() => openPostDetail(post)}>
-                  <MessageSquare className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => {
-                    setSelectedPost(post)
-                    setShowEditDialog(true)
-                  }}
-                >
-                  <Edit2 className="w-4 h-4" />
-                </Button>
-                <Button variant="ghost" size="sm" onClick={() => deletePost(post.id)}>
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  )
-
-  // 댓글 렌더링
-  // const renderComments = (postId: number) => (
-  //   <div className="mt-2">
-  //     <div className="flex items-center justify-between mb-2">
-  //       <h3 className="text-sm font-semibold">댓글</h3>
-  //       <Button
-  //         size="sm"
-  //         onClick={() => {
-  //           setNewComment((prev) => ({ ...prev, postId }))
-  //           setShowAddCommentDialog(true)
-  //         }}
-  //       >
-  //         <Plus className="w-3 h-3 mr-1" />
-  //         댓글 추가
-  //       </Button>
-  //     </div>
-  //     <div className="space-y-1">
-  //       {comments[postId]?.map((comment) => (
-  //         <div key={comment.id} className="flex items-center justify-between text-sm border-b pb-1">
-  //           <div className="flex items-center space-x-2 overflow-hidden">
-  //             <span className="font-medium truncate">{comment.user?.username}:</span>
-  //             <span className="truncate">{highlightText(comment.body, searchQuery)}</span>
-  //           </div>
-  //           <div className="flex items-center space-x-1">
-  //             <Button variant="ghost" size="sm" onClick={() => likeComment(comment.id, postId)}>
-  //               <ThumbsUp className="w-3 h-3" />
-  //               <span className="ml-1 text-xs">{comment.likes}</span>
-  //             </Button>
-  //             <Button
-  //               variant="ghost"
-  //               size="sm"
-  //               onClick={() => {
-  //                 setSelectedComment(comment)
-  //                 setShowEditCommentDialog(true)
-  //               }}
-  //             >
-  //               <Edit2 className="w-3 h-3" />
-  //             </Button>
-  //             <Button variant="ghost" size="sm" onClick={() => deleteComment(comment.id, postId)}>
-  //               <Trash2 className="w-3 h-3" />
-  //             </Button>
-  //           </div>
-  //         </div>
-  //       ))}
-  //     </div>
-  //   </div>
-  // )
-
   return (
     <Card className="w-full max-w-6xl mx-auto">
       <CardHeader>
@@ -575,130 +430,63 @@ const PostsManager = () => {
           </div>
 
           {/* 게시물 테이블 */}
-          {loading ? <div className="flex justify-center p-4">로딩 중...</div> : renderPostTable()}
+          {loading ? (
+            <div className="flex justify-center p-4">로딩 중...</div>
+          ) : (
+            <PostTable
+              posts={posts}
+              searchQuery={searchQuery}
+              selectedTag={selectedTag}
+              setSelectedTag={setSelectedTag}
+              updateURL={updateURL}
+              openUserModal={openUserModal}
+              openPostDetail={openPostDetail}
+              setSelectedPost={setSelectedPost}
+              setShowEditDialog={setShowEditDialog}
+              deletePost={deletePost}
+            />
+          )}
 
           {/* 페이지네이션 */}
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <span>표시</span>
-              <Select value={limit.toString()} onValueChange={(value) => setLimit(Number(value))}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="10" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="20">20</SelectItem>
-                  <SelectItem value="30">30</SelectItem>
-                </SelectContent>
-              </Select>
-              <span>항목</span>
-            </div>
-            <div className="flex gap-2">
-              <Button disabled={skip === 0} onClick={() => setSkip(Math.max(0, skip - limit))}>
-                이전
-              </Button>
-              <Button disabled={skip + limit >= total} onClick={() => setSkip(skip + limit)}>
-                다음
-              </Button>
-            </div>
-          </div>
+          <Pagination limit={limit} skip={skip} total={total} onLimitChange={setLimit} onSkipChange={setSkip} />
         </div>
       </CardContent>
 
-      {/* 게시물 추가 대화상자 */}
-      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>새 게시물 추가</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Input
-              placeholder="제목"
-              value={newPost.title}
-              onChange={(e) => setNewPost({ ...newPost, title: e.target.value })}
-            />
-            <Textarea
-              rows={30}
-              placeholder="내용"
-              value={newPost.body}
-              onChange={(e) => setNewPost({ ...newPost, body: e.target.value })}
-            />
-            <Input
-              type="number"
-              placeholder="사용자 ID"
-              value={newPost.userId}
-              onChange={(e) => setNewPost({ ...newPost, userId: Number(e.target.value) })}
-            />
-            <Button onClick={addPost}>게시물 추가</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* 게시물 수정 대화상자 */}
-      <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>게시물 수정</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Input
-              placeholder="제목"
-              value={selectedPost?.title || ""}
-              onChange={(e) => {
-                if (!selectedPost) return
-                setSelectedPost({ ...selectedPost, title: e.target.value })
-              }}
-            />
-            <Textarea
-              rows={15}
-              placeholder="내용"
-              value={selectedPost?.body || ""}
-              onChange={(e) => {
-                if (!selectedPost) return
-                setSelectedPost({ ...selectedPost, body: e.target.value })
-              }}
-            />
-            <Button onClick={updatePost}>게시물 업데이트</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
       {/* 댓글 추가 대화상자 */}
-      <Dialog open={showAddCommentDialog} onOpenChange={setShowAddCommentDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>새 댓글 추가</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Textarea
-              placeholder="댓글 내용"
-              value={newComment.body}
-              onChange={(e) => setNewComment({ ...newComment, body: e.target.value })}
-            />
-            <Button onClick={addComment}>댓글 추가</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <AddCommentModal
+        open={showAddCommentDialog}
+        onOpenChange={setShowAddCommentDialog}
+        newComment={newComment}
+        onChange={setNewComment}
+        onClick={addComment}
+      />
 
       {/* 댓글 수정 대화상자 */}
-      <Dialog open={showEditCommentDialog} onOpenChange={setShowEditCommentDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>댓글 수정</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <Textarea
-              placeholder="댓글 내용"
-              value={selectedComment?.body || ""}
-              onChange={(e) => {
-                if (!selectedComment) return
-                setSelectedComment({ ...selectedComment, body: e.target.value })
-              }}
-            />
-            <Button onClick={updateComment}>댓글 업데이트</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <EditCommentModal
+        open={showEditCommentDialog}
+        onOpenChange={setShowEditCommentDialog}
+        comment={selectedComment}
+        onChange={setSelectedComment}
+        onClick={updateComment}
+      />
+
+      {/* 게시물 추가 대화상자 */}
+      <PostAddModal
+        open={showAddDialog}
+        onOpenChange={setShowAddDialog}
+        newPost={newPost}
+        onChange={setNewPost}
+        onClick={addPost}
+      />
+
+      {/* 게시물 수정 대화상자 */}
+      <PostEditModal
+        open={showEditDialog}
+        onOpenChange={setShowEditDialog}
+        post={selectedPost}
+        onChange={setSelectedPost}
+        onClick={updatePost}
+      />
 
       {/* 게시물 상세 보기 대화상자 */}
       <PostDetailModal

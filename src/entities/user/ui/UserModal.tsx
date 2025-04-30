@@ -1,6 +1,7 @@
 import { Dialog, DialogContent, DialogTitle } from "@radix-ui/react-dialog"
-import { DialogHeader } from "../../../shared/ui"
+
 import { User } from "../model/types"
+import { DialogHeader } from "../../../shared/ui/Modal"
 
 interface UserModalProps {
   open: boolean
