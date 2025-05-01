@@ -16,8 +16,8 @@ import { Pagination } from "../shared/ui/Pagination"
 import { Button } from "../shared/ui/Button"
 import { Card, CardContent, CardHeader, CardTitle } from "../shared/ui/Card"
 import { Input } from "../shared/ui/Input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@radix-ui/react-select"
 import { PostTable } from "../features/post/ui/PostTable"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../shared/ui/Select"
 
 const PostsManager = () => {
   const navigate = useNavigate()

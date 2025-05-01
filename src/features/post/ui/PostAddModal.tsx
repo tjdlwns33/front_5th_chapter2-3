@@ -1,5 +1,4 @@
-import { Dialog, DialogContent, DialogTitle } from "@radix-ui/react-dialog"
-import { DialogHeader } from "../../../shared/ui/Modal"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../shared/ui/Modal"
 import { Input } from "../../../shared/ui/Input"
 import { Textarea } from "../../../shared/ui/Textarea"
 import { Button } from "../../../shared/ui/Button"

@@ -1,6 +1,6 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@radix-ui/react-select"
 import { forwardRef } from "react"
 import { Button } from "./Button"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./Select"
 
 interface PaginationProps extends React.HTMLAttributes<HTMLDivElement> {
   limit: number
@@ -12,7 +12,7 @@ interface PaginationProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const Pagination = forwardRef<HTMLDivElement, PaginationProps>(
   ({ className, limit, skip, total, onLimitChange, onSkipChange, ...props }, ref) => (
-    <div className="flex justify-between items-center" ref={ref} {...props}>
+    <div className={`flex justify-between items-center ${className}`} ref={ref} {...props}>
       <div className="flex items-center gap-2">
         <span>표시</span>
         <Select value={limit.toString()} onValueChange={(value) => onLimitChange(Number(value))}>

@@ -1,7 +1,5 @@
-import { Dialog, DialogContent, DialogTitle } from "@radix-ui/react-dialog"
-
 import { Comment } from "../../../entities/comment/model/types"
-import { DialogHeader } from "../../../shared/ui/Modal"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../../../shared/ui/Modal"
 import { Textarea } from "../../../shared/ui/Textarea"
 import { Button } from "../../../shared/ui/Button"
 

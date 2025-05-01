@@ -1,5 +1,5 @@
-import { Edit2, MessageSquare, Table, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react"
-import { TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../shared/ui/Table"
+import { Edit2, MessageSquare, ThumbsDown, ThumbsUp, Trash2 } from "lucide-react"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../../shared/ui/Table"
 import { Button } from "../../../shared/ui/Button"
 import { highlightText } from "../../../shared/lib/highlightText"
 import { Post } from "../../../entities/post/model/types"
